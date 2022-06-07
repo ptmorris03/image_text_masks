@@ -1,6 +1,6 @@
 import jax
 import jax.numpy as jnp
-import numpy as numpy
+import numpy as np
 
 
 __all__ = ["CLIP", "CLIP_ENCODE_IMAGE", "CLIP_ENCODE_TEXT", "CLIP_SIMILARITY", "similarity"]
