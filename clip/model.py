@@ -105,12 +105,15 @@ def CLIP_ENCODE_TEXT(params, text, name=''):
 
     layers = len(set(k.split(".")[2] for k in params if k.startswith(f"transformer.resblocks")))
     heads = scale_final.shape[0] // 64
+    
+    mask = jnp.full((text.shape[-1], text.shape[-1]), -10e10)
+    mask = jnp.triu(mask, 1)
 
     x = jnp.asarray(token_emb)[(text,)]
     x = x + pos_emb
 
     x = x.transpose((1, 0, 2))
-    x = CLIP_TRANSFORMER(params, x, layers, heads, name=name + 'transformer')
+    x = CLIP_TRANSFORMER(params, x, layers, heads, mask=mask, name=name + 'transformer')
     x = x.transpose((1, 0, 2))
     x = layernorm(x, scale_final, offset_final)
     x = x[jnp.arange(x.shape[0]), text.argmax(axis=-1)]
