@@ -119,7 +119,9 @@ def load(name: str, jit=True):
         dtype = jnp.int64 if tensor.dtype == torch.int64 else jnp.float32
         params[key] = jnp.array(tensor.detach().numpy(), dtype=dtype)
 
-    return params
+    n_px = int(params['input_resolution'])
+
+    return params, image_processor(n_px)
 
 
 
