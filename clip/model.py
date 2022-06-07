@@ -117,6 +117,7 @@ def CLIP_ENCODE_TEXT(params, text, name=''):
     x = x.transpose((1, 0, 2))
     x = layernorm(x, scale_final, offset_final)
     print(jnp.linalg.norm(x[0] - x[1]))
+    print(text.argmax(axis=-1), x.shape)
     x = x[jnp.arange(x.shape[0]), text.argmax(axis=-1)]
     print(jnp.linalg.norm(x[0] - x[1]))
     return x @ proj
