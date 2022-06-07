@@ -116,7 +116,8 @@ def load(name: str, jit=True):
 
     params = {}
     for key, tensor in state_dict.items():
-        params[key] = jnp.array(tensor.detach().numpy(), dtype=jnp.float32)
+        dtype = jnp.int64 if tensor.dtype == torch.int64 else jnp.float32
+        params[key] = jnp.array(tensor.detach().numpy(), dtype=dtype)
 
     return params
 
