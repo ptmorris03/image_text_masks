@@ -112,7 +112,7 @@ def load(name: str):
 
     params = {}
     for key, tensor in state_dict.items():
-        dtype = jnp.int64 if tensor.dtype == torch.int64 else jnp.float32
+        dtype = jnp.int32 if tensor.dtype == torch.int64 else jnp.float32
         params[key] = jnp.array(tensor.detach().numpy(), dtype=dtype)
 
     n_px = int(params['input_resolution'])
@@ -142,7 +142,7 @@ def tokenize(texts: Union[str, List[str]], context_length: int = 77, truncate: b
     sot_token = _tokenizer.encoder["<|startoftext|>"]
     eot_token = _tokenizer.encoder["<|endoftext|>"]
     all_tokens = [[sot_token] + _tokenizer.encode(text) + [eot_token] for text in texts]
-    result = np.zeros((len(all_tokens), context_length), dtype=int)
+    result = np.zeros((len(all_tokens), context_length), dtype=np.int32)
 
     for i, tokens in enumerate(all_tokens):
         if len(tokens) > context_length:
