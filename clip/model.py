@@ -66,7 +66,7 @@ def CLIP_RESBLOCK(params, x, heads: int, mask=None, name=''):
 
 def CLIP_TRANSFORMER(params, x, layers: int, heads: int, mask=None, name=''):
     for i in range(layers):
-        x = CLIP_RESBLOCK(params, x, heads, mask=mask, name + F'.resblocks.{i}')
+        x = CLIP_RESBLOCK(params, x, heads, mask=mask, name=name + F'.resblocks.{i}')
     return x
 
 def CLIP_ENCODE_IMAGE(params, image, name='visual'):
