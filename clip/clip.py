@@ -21,7 +21,7 @@ except ImportError:
     BICUBIC = Image.BICUBIC
 
 #__all__ = ["available_models", "load", "tokenize"]
-__all__ = ["available_models", "tokenize"]
+__all__ = ["available_models", "tokenize", "image_processor"]
 _tokenizer = _Tokenizer()
 
 _MODELS = {
@@ -76,6 +76,9 @@ def _transform(n_px):
         ToTensor(),
         Normalize((0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711)),
     ])
+
+def image_processor(pixels: int = 224):
+    return _transform(pixels)
 
 
 def available_models() -> List[str]:
