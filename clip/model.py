@@ -61,9 +61,7 @@ def CLIP_ATTN(params, x, heads: int, mask=None, name=''):
     return linear(attn, weight_out, bias_out)
 
 def CLIP_RESBLOCK(params, x, heads: int, mask=None, name=''):
-    print(jnp.linalg.norm(x[:,0] - x[:,1]))
     x = CLIP_ATTN(params, x, heads, mask, name)
-    print(jnp.linalg.norm(x[:,0] - x[:,1]))
     return CLIP_MLP(params, x, name)
 
 def CLIP_TRANSFORMER(params, x, layers: int, heads: int, mask=None, name=''):
@@ -118,8 +116,9 @@ def CLIP_ENCODE_TEXT(params, text, name=''):
     x = CLIP_TRANSFORMER(params, x, layers, heads, mask=mask, name=name + 'transformer')
     x = x.transpose((1, 0, 2))
     x = layernorm(x, scale_final, offset_final)
+    print(jnp.linalg.norm(x[0] - x[1]))
     x = x[jnp.arange(x.shape[0]), text.argmax(axis=-1)]
-
+    print(jnp.linalg.norm(x[0] - x[1]))
     return x @ proj
 
 def similarity(image, text, logit_scale):
