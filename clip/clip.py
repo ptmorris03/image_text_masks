@@ -20,8 +20,7 @@ try:
 except ImportError:
     BICUBIC = Image.BICUBIC
 
-#__all__ = ["available_models", "load", "tokenize"]
-__all__ = ["available_models", "tokenize", "image_processor"]
+__all__ = ["available_models", "load", "tokenize", "image_processor"]
 _tokenizer = _Tokenizer()
 
 _MODELS = {
@@ -81,6 +80,41 @@ def image_processor(pixels: int = 224):
 def available_models() -> List[str]:
     """Returns the names of available CLIP models"""
     return list(_MODELS.keys())
+
+    
+def load(name: str, device: Union[str, torch.device] = "cpu", jit=True):
+    """Load a CLIP model
+    Parameters
+    ----------
+    name : str
+        A model name listed by `clip.available_models()`, or the path to a model checkpoint containing the state_dict
+    device : Union[str, torch.device]
+        The device to put the loaded model
+    jit : bool
+        Whether to load the optimized JIT model (default) or more hackable non-JIT model.
+    Returns
+    -------
+    model : torch.nn.Module
+        The CLIP model
+    preprocess : Callable[[PIL.Image], torch.Tensor]
+        A torchvision transform that converts a PIL image into a tensor that the returned model can take as its input
+    """
+    if name in _MODELS:
+        model_path = _download(_MODELS[name])
+    elif os.path.isfile(name):
+        model_path = name
+    else:
+        raise RuntimeError(f"Model {name} not found; available models = {available_models()}")
+
+    try:
+        # loading JIT archive
+        state_dict = torch.jit.load(model_path, map_location=device if jit else "cpu").eval().state_dict()
+    except RuntimeError:
+        state_dict = torch.load(model_path, map_location="cpu")
+
+    return state_dict
+
+
 
 def tokenize(texts: Union[str, List[str]], context_length: int = 77, truncate: bool = False) -> np.ndarray:
     """
