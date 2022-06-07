@@ -128,7 +128,7 @@ def similarity(image, text, logit_scale):
     return image_logits, text_logits
 
 def CLIP_SIMILARITY(params, image, text):
-    logit_scale = params['logic_scale']
+    logit_scale = params['logit_scale']
 
     return similarity(image, text, logit_scale)
 
