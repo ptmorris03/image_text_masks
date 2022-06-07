@@ -90,7 +90,7 @@ def CLIP_ENCODE_IMAGE(params, image, name='visual'):
 
     x = layernorm(x, scale_pre, offset_pre)
     x = x.transpose((1, 0, 2))
-    x = CLIP_TRANSFORMER(params, x, layers, heads, name + '.transformer')
+    x = CLIP_TRANSFORMER(params, x, layers, heads, name=name + '.transformer')
     x = x.transpose((1, 0, 2))
     x = layernorm(x[:,0,:], scale_post, offset_post)
 
@@ -110,7 +110,7 @@ def CLIP_ENCODE_TEXT(params, text, name=''):
     x = x + pos_emb
 
     x = x.transpose((1, 0, 2))
-    x = CLIP_TRANSFORMER(params, x, layers, heads, name + 'transformer')
+    x = CLIP_TRANSFORMER(params, x, layers, heads, name=name + 'transformer')
     x = x.transpose((1, 0, 2))
     x = layernorm(x, scale_final, offset_final)
     x = x[jnp.arange(x.shape[0]), text.argmax(axis=-1)]
