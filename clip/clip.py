@@ -103,7 +103,7 @@ def tokenize(texts: Union[str, List[str]], context_length: int = 77, truncate: b
     sot_token = _tokenizer.encoder["<|startoftext|>"]
     eot_token = _tokenizer.encoder["<|endoftext|>"]
     all_tokens = [[sot_token] + _tokenizer.encode(text) + [eot_token] for text in texts]
-    result = np.zeros(len(all_tokens), context_length, dtype=int)
+    result = np.zeros((len(all_tokens), context_length), dtype=int)
 
     for i, tokens in enumerate(all_tokens):
         if len(tokens) > context_length:
