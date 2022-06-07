@@ -7,6 +7,8 @@ from pkg_resources import packaging
 
 import torch
 import numpy as np
+import jax
+import jax.numpy as jnp
 from PIL import Image
 from torchvision.transforms import Compose, Resize, CenterCrop, ToTensor, Normalize
 from tqdm import tqdm
@@ -82,7 +84,7 @@ def available_models() -> List[str]:
     return list(_MODELS.keys())
 
     
-def load(name: str, device: Union[str, torch.device] = "cpu", jit=True):
+def load(name: str, jit=True):
     """Load a CLIP model
     Parameters
     ----------
@@ -108,11 +110,15 @@ def load(name: str, device: Union[str, torch.device] = "cpu", jit=True):
 
     try:
         # loading JIT archive
-        state_dict = torch.jit.load(model_path, map_location=device if jit else "cpu").eval().state_dict()
+        state_dict = torch.jit.load(model_path, map_location="cpu").eval().state_dict()
     except RuntimeError:
         state_dict = torch.load(model_path, map_location="cpu")
 
-    return state_dict
+    params = {}
+    for key, tensor in state_dict.items():
+        params[key] = jnp.array(tensor.detach().numpy(), dtype=jnp.float32)
+
+    return params
 
 
 
