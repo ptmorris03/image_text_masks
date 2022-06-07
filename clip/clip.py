@@ -84,16 +84,12 @@ def available_models() -> List[str]:
     return list(_MODELS.keys())
 
     
-def load(name: str, jit=True):
+def load(name: str):
     """Load a CLIP model
     Parameters
     ----------
     name : str
         A model name listed by `clip.available_models()`, or the path to a model checkpoint containing the state_dict
-    device : Union[str, torch.device]
-        The device to put the loaded model
-    jit : bool
-        Whether to load the optimized JIT model (default) or more hackable non-JIT model.
     Returns
     -------
     model : torch.nn.Module
