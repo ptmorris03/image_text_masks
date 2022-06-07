@@ -102,11 +102,12 @@ def CLIP_ENCODE_TEXT(params, text, name=''):
     scale_final = params[name + 'ln_final.weight']
     offset_final = params[name + 'ln_final.bias']
     proj = params[name + 'text_projection']
+    ctx_len = int(params[name + 'context_length'])
 
     layers = len(set(k.split(".")[2] for k in params if k.startswith(f"transformer.resblocks")))
     heads = scale_final.shape[0] // 64
     
-    mask = jnp.full((text.shape[-1], text.shape[-1]), -10e10)
+    mask = jnp.full((ctx_len, ctx_len), -10e10)
     mask = jnp.triu(mask, 1)
 
     x = jnp.asarray(token_emb)[(text,)]
