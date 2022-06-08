@@ -126,7 +126,7 @@ def encode_text(params, text, name=''):
 def similarity(image, text, topk=False):
     image = image / jnp.linalg.norm(image, axis=-1, keepdims=True)
     text = text / jnp.linalg.norm(text, axis=-1, keepdims=True)
-    softmax = (100.0 * image @ text.T).softmax(dim=-1)
+    softmax = jax.nn.softmax(100.0 * image @ text.T, axis=-1)
     if topk:
         return jax.lax.top_k(softmax, topk)
     return softmax
