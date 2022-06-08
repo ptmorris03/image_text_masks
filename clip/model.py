@@ -3,7 +3,7 @@ import jax.numpy as jnp
 import numpy as np
 
 
-__all__ = ["CLIP", "CLIP_ENCODE_IMAGE", "CLIP_ENCODE_TEXT", "CLIP_SIMILARITY", "similarity"]
+__all__ = ["similar", "CLIP_ENCODE_IMAGE", "CLIP_ENCODE_TEXT", "CLIP_SIMILARITY", "similarity"]
 
 
 def QuickGELU(x):
@@ -69,7 +69,7 @@ def CLIP_TRANSFORMER(params, x, layers: int, heads: int, mask=None, name=''):
         x = CLIP_RESBLOCK(params, x, heads, mask=mask, name=name + F'.resblocks.{i}')
     return x
 
-def CLIP_ENCODE_IMAGE(params, image, name='visual'):
+def encode_image(params, image, name='visual'):
     conv_kernel = params[name + '.conv1.weight']
     class_emb = params[name + '.class_embedding']
     pos_emb = params[name + '.positional_embedding']
@@ -96,7 +96,7 @@ def CLIP_ENCODE_IMAGE(params, image, name='visual'):
 
     return x @ proj
 
-def CLIP_ENCODE_TEXT(params, text, name=''):
+def encode_text(params, text, name=''):
     token_emb = params[name + 'token_embedding.weight']
     pos_emb = params[name + 'positional_embedding']
     scale_final = params[name + 'ln_final.weight']
@@ -123,23 +123,16 @@ def CLIP_ENCODE_TEXT(params, text, name=''):
     print(jnp.linalg.norm(x[0] - x[1]))
     return x @ proj
 
-def similarity(image, text, logit_scale):
+def similarity(image, text, topk=False):
     image = image / jnp.linalg.norm(image, axis=-1, keepdims=True)
     text = text / jnp.linalg.norm(text, axis=-1, keepdims=True)
+    softmax = (100.0 * image @ text.T).softmax(dim=-1)
+    if topk:
+        return jax.lax.top_k(softmax, topk)
+    return softmax
 
-    logit_scale = jnp.exp(logit_scale)
-    image_logits = logit_scale * image @ text.transpose()
-    text_logits = logit_scale * text @ image.transpose()
-
-    return image_logits, text_logits
-
-def CLIP_SIMILARITY(params, image, text):
-    logit_scale = params['logit_scale']
-
-    return similarity(image, text, logit_scale)
-
-def CLIP(params, image, text):
-    image = CLIP_ENCODE_IMAGE(params, image)
-    text = CLIP_ENCODE_TEXT(params, text)
-    return CLIP_SIMILARITY(params, image, text)
+def compare(params, image, text, topk=False):
+    image = encode_image(params, image)
+    text = encode_text(params, text)
+    return similar(params, image, text, topk)
 
