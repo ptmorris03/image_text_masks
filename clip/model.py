@@ -3,7 +3,7 @@ import jax.numpy as jnp
 import numpy as np
 
 
-__all__ = ["similar", "CLIP_ENCODE_IMAGE", "CLIP_ENCODE_TEXT", "CLIP_SIMILARITY", "similarity"]
+__all__ = ["similarity", "compare", "encode_image", "encode_text"]
 
 
 def QuickGELU(x):
