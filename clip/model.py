@@ -134,5 +134,5 @@ def similarity(image, text, topk=False):
 def compare(params, image, text, topk=False):
     image = encode_image(params, image)
     text = encode_text(params, text)
-    return similarity(params, image, text, topk)
+    return similarity(image, text, topk)
 
